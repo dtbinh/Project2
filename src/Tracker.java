@@ -1,8 +1,5 @@
 
-import java.util.Random;
-
 import lejos.robotics.navigation.DifferentialPilot;
-import lejos.util.Delay;
 import lejos.nxt.*;
 
 /**
@@ -32,10 +29,6 @@ public class Tracker
    */
   private LightSensor rightEye;
   /**
-   * controls the direction of turns
-   */
-  private int turnDirection = 1;
-  /**
    * count numbers of turns that been made
    */
   private int count = 0;
@@ -48,9 +41,9 @@ public class Tracker
   public Tracker(DifferentialPilot thePilot, LightSensor leftEye , LightSensor  rightEye)
   {
     pilot = thePilot;
-    pilot.setTravelSpeed(15);
+    pilot.setTravelSpeed(20);
     pilot.setRotateSpeed(180);
-    pilot.setAcceleration(400);
+    pilot.setAcceleration(800);
     this.leftEye = leftEye;
     this.leftEye.setFloodlight(true);
     this.rightEye = rightEye;
@@ -77,103 +70,23 @@ public class Tracker
 	  		if (lval < -25 || rval < -25) {
 	  			count++;
 	  			Sound.playTone(1000,100);
-	  			pilot.travel(7.8);
-	  			stop();
+	  			pilot.travel(7.9);
 	  			break;
 	  		}
 	  	}
   }
   
-  public void gridNavigation() {
-	  Button.waitForAnyPress();
-	  int numberOfTurns = 0;
-	  gridNavigation(numberOfTurns);
+  
+  public void turn (int quater) {
+	  pilot.rotate(quater*90); // minus = left, plus = right
   }
   
-  public boolean gridNavigation(int numberOfTurns) {
-	  if (numberOfTurns > 8) {
-		  return true;
-	  }
-	  trackLine();
-	  Random rng = new Random();
-	  int turnDir = rng.nextInt(3)-1;
-	  System.out.println(turnDir);
-	  int lval = leftEye.getLightValue();
-	  int rval = rightEye.getLightValue();
-	  System.out.println(lval);
-	  System.out.println(rval);
-	  if (lval > 90 || rval > 90) {
-			turnDir = 2;
-	  }
-	  pilot.rotate(90*turnDir);
-	  numberOfTurns++;
-	  gridNavigation(numberOfTurns);
-	  return false;
-  }
-
-
-  
-  /**
-  follow the track for 4 complete circuits, turn around, and complete 4 circuits in opposite direction
-   */
-  public void trackAndTurn() {
-	  Button.waitForAnyPress();
-	  while(count < 8) {
-		  trackLine();
-	  }
-	  stop();
-	  pilot.rotate(180);
-	  while(count < 16) {
-		  trackLine();
-	  }
-	  stop();
-	  count = 0;
+  public int getCount() {
+	  return count;
   }
   
-  /**
-   * makes the robot do 4 figure 8 circuits
-   uses trackAnEight(int param) 
-   */
-  public void trackAnEight() {
-	  Button.waitForAnyPress();
-	  int numberOfTurns = 0;
-	  trackAnEight(numberOfTurns);
-  }
-  
-  /**
-   * Help method of trackAnEight(),
-   * @param numberOfTurns
-   */
-  public boolean trackAnEight(int numberOfTurns) {
-	  if (numberOfTurns >= 8) {
-		  stop();
-		  return true;
-	  }
-	  while(count < 1) { 
-		  trackLine();
-	  }
-	  stop();
-	  pilot.rotate(90);
-	  while(count < 2) {
-		  trackLine();
-	  }
-	  stop();
-	  pilot.rotate(-90);
-	  while(count < 3) { 
-		  trackLine();
-	  }
-	  stop();
-	  pilot.rotate(-90);
-	  while(count < 4) {
-		  trackLine();
-	  }
-	  stop();
-	  pilot.rotate(90);
-	  count=0;
-	  numberOfTurns = numberOfTurns + 4;
-	  System.out.println(numberOfTurns);
-	  trackAnEight(numberOfTurns);
-	  return false;
+  public void setCount(int count) {
+	  this.count = count;
   }
 
   /**
