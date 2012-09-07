@@ -1,6 +1,5 @@
 
 import lejos.nxt.*;
-import lejos.util.Datalogger;
 import lejos.util.Delay;
 
 /**
